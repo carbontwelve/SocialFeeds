@@ -11,7 +11,6 @@ use Carbontwelve\Widgets\SocialFeeds\Feeds\FeedItem;
 
 class InstagramUserActivityFeed extends AbstractFeed implements FeedInterface
 {
-
     /**
      * The Public facing name of this feed
      *
@@ -24,7 +23,13 @@ class InstagramUserActivityFeed extends AbstractFeed implements FeedInterface
      *
      * @var string
      */
-    protected $feedSrc = 'http://instagram.com//%USERNAME%';
+    protected $feedSrc = 'http://instagram.com/%USERNAME%';
+
+    /**
+     * The follow user source url
+     * @var string
+     */
+    protected $followSrc = 'http://instagram.com/%USERNAME%';
 
     /**
      * Unique fields for the source url, this is so that we may have different inputs for the widget

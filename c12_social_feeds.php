@@ -104,7 +104,10 @@ class PinterestFeedWidget extends \WP_Widget {
         $output .= $view->render(array(
             'widget'        => $this,
             'title'         => $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'],
-            'items'         => $dataProvider->execute()
+            'items'         => $dataProvider->execute(),
+            'followSrc'     => $dataProvider->getFollowSrc(),
+            'feed_type'     => $instance['feed'],
+            'fields'        => $instance['metaFields'][$instance['feed']]
         ));
         $output .= $args['after_widget'];
 

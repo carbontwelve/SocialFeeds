@@ -17,6 +17,8 @@ interface FeedInterface
 
     public function getName();
 
+    public function getFollowSrc();
+
     public function getUniqueFields();
 
     public function hydrate( array $fields );

@@ -4,7 +4,6 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . 'FeedInterface.php');
 
 abstract class AbstractFeed  implements FeedInterface
 {
-
     /**
      * The Public facing name of this feed
      *
@@ -18,6 +17,12 @@ abstract class AbstractFeed  implements FeedInterface
      * @var string
      */
     protected $feedSrc = '';
+
+    /**
+     * The follow user source url
+     * @var string
+     */
+    protected $followSrc = '';
 
     /**
      * Unique fields for the source url, this is so that we may have different inputs for the widget
@@ -131,6 +136,16 @@ abstract class AbstractFeed  implements FeedInterface
     public function getUniqueFields()
     {
         return $this->uniqueFields;
+    }
+
+    /**
+     * Get the follow link for this feed type
+     *
+     * @return string
+     */
+    public function getFollowSrc()
+    {
+        return str_replace('%USERNAME%', $this->feedData['USERNAME'], $this->followSrc);
     }
 
     /**

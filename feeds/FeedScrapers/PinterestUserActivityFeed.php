@@ -27,6 +27,12 @@ class PinterestUserActivityFeed extends AbstractFeed implements FeedInterface
     protected $feedSrc = 'https://pinterest.com/%USERNAME%/feed.rss';
 
     /**
+     * The follow user source url
+     * @var string
+     */
+    protected $followSrc = 'https://pinterest.com/%USERNAME%/';
+
+    /**
      * Unique fields for the source url, this is so that we may have different inputs for the widget
      * depending upon which source feed the user has defined
      *
