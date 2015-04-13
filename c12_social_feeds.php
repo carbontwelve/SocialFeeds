@@ -88,28 +88,43 @@ class PinterestFeedWidget extends \WP_Widget {
     public function widget( $args, $instance )
     {
 
-        $dataProvider = $this->feedFactory->getFeed( $instance['feed'] );
-        $dataProvider->setNumberOfItems( $instance['numberOfPins'] );
-        $dataProvider->hydrate( $instance['metaFields'][$instance['feed']] );
+        //delete_transient($this->slug);
 
-        $view = new View( base64_decode($instance['template']) );
-
-        // If the loaded view does not exist then roll back to a sane default
-        if ( ! $view->exists() )
-        {
-            $view  = new View( base64_decode($this->defaultTemplate) );
+        if ( ! ( $cache = get_transient( $this->slug ) ) ) {
+            $cache = array();
+            set_transient( $this->slug, $cache, 1 * HOUR_IN_SECONDS );
         }
 
-        $output  = $args['before_widget'];
-        $output .= $view->render(array(
-            'widget'        => $this,
-            'title'         => $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'],
-            'items'         => $dataProvider->execute(),
-            'followSrc'     => $dataProvider->getFollowSrc(),
-            'feed_type'     => $instance['feed'],
-            'fields'        => $instance['metaFields'][$instance['feed']]
-        ));
-        $output .= $args['after_widget'];
+        if ( ! isset($cache[$args['widget_id']]) ) {
+
+            $dataProvider = $this->feedFactory->getFeed($instance['feed']);
+            $dataProvider->setNumberOfItems($instance['numberOfPins']);
+            $dataProvider->hydrate($instance['metaFields'][$instance['feed']]);
+
+            $view = new View(base64_decode($instance['template']));
+
+            // If the loaded view does not exist then roll back to a sane default
+            if (!$view->exists()) {
+                $view = new View(base64_decode($this->defaultTemplate));
+            }
+
+            $output = $args['before_widget'];
+            $output .= $view->render(array(
+                'widget' => $this,
+                'title' => $args['before_title'] . apply_filters('widget_title', $instance['title']) . $args['after_title'],
+                'items' => $dataProvider->execute(),
+                'followSrc' => $dataProvider->getFollowSrc(),
+                'feed_type' => $instance['feed'],
+                'fields' => $instance['metaFields'][$instance['feed']]
+            ));
+            $output .= $args['after_widget'];
+
+            $cache[ $args['widget_id'] ] = base64_encode($output);
+            set_transient( $this->slug, $cache, 1 * HOUR_IN_SECONDS );
+
+        }else{
+            $output = base64_decode( $cache[$args['widget_id']] ) . '<!-- From cache -->';
+        }
 
         echo $output;
     }
