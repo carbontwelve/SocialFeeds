@@ -1,5 +1,5 @@
 {
-  "name": "carbontwelve/social-feeds",
+  "name": "carbontwelve/wordpress-social-feeds",
   "type": "wordpress-plugin",
   "license": "MIT",
   "description": "A widget that provides nicely formatted social media feeds for WordPress",
@@ -15,7 +15,7 @@
     "wordpress"
   ],
   "support": {
-    "issues": "https://github.com/carbontwelve/SocialFeeds/issues"
+    "issues": "https://github.com/carbontwelve/wordpress-social-feeds/issues"
   },
   "require": {
     "php": ">=5.4.0",
