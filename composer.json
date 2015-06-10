@@ -2,13 +2,13 @@
   "name": "carbontwelve/social-feeds",
   "type": "wordpress-plugin",
   "license": "MIT",
-  "description": "Some nice feed formatters for Wordpress",
+  "description": "Some nice feed formatters for WordPress",
   "homepage": "http://www.photogabble.co.uk",
   "authors": [
     {
       "name": "Simon Dann",
       "email": "simon.dann@gmail.com",
-      "homepage": "http://www.photogabble.co.uk"
+      "homepage": "http://www.photogabble.co.uk/about"
     }
   ],
   "keywords": [
