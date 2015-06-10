@@ -78,7 +78,7 @@ class InstagramUserActivityFeed extends AbstractFeed implements FeedInterface
                 return null;
             }
 
-            $userMedia = isset( $json['entry_data']['UserProfile'][0]['userMedia'] ) ? $json['entry_data']['UserProfile'][0]['userMedia'] : array();
+            $userMedia = isset( $json['entry_data']['ProfilePage'][0]['user']['media']['nodes'] ) ? $json['entry_data']['ProfilePage'][0]['user']['media']['nodes'] : array();
 
             if (empty($userMedia))
             {
@@ -88,13 +88,6 @@ class InstagramUserActivityFeed extends AbstractFeed implements FeedInterface
             $foundMedia = array();
 
             foreach ( $userMedia as $media ) {
-
-                // If the media type is not an image (a video for example) then we need to skip it
-                if ( $media['type'] !== 'image')
-                {
-                    continue;
-                }
-
                 // If we have enough items then we should break the foreach
                 if (count($foundMedia) >= $this->numberOfItems)
                 {
@@ -102,11 +95,10 @@ class InstagramUserActivityFeed extends AbstractFeed implements FeedInterface
                 }
 
                 $tmp = new FeedItem();
-                $tmp->title = $media['caption']['text'];
-                $tmp->date  = date( $this->dateFormat, (int) $media['created_time']);
-                $tmp->href  = $media['link'];
-                $tmp->src   = $media['images']['thumbnail']['url'];
-
+                $tmp->title   = 'Click to view more';
+                $tmp->date    = date( $this->dateFormat, (int) $media['date']);
+                $tmp->href    = 'https://instagram.com/p/' .$media['code'];
+                $tmp->src     = $media['display_src'];
                 $foundMedia[] = $tmp;
             }
 
