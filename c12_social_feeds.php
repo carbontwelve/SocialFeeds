@@ -82,13 +82,12 @@ class PinterestFeedWidget extends \WP_Widget {
      *
      * @see WP_Widget::widget()
      *
-     * @param array $args     Widget arguments.
+     * @param array $args Widget arguments.
      * @param array $instance Saved values from database.
+     * @return bool
      */
     public function widget( $args, $instance )
     {
-
-        //delete_transient($this->slug);
 
         if ( ! ( $cache = get_transient( $this->slug ) ) ) {
             $cache = array();
@@ -97,36 +96,44 @@ class PinterestFeedWidget extends \WP_Widget {
 
         if ( ! isset($cache[$args['widget_id']]) ) {
 
-            $dataProvider = $this->feedFactory->getFeed($instance['feed']);
-            $dataProvider->setNumberOfItems($instance['numberOfPins']);
-            $dataProvider->hydrate($instance['metaFields'][$instance['feed']]);
+            try {
+                $dataProvider = $this->feedFactory->getFeed($instance['feed']);
+                $dataProvider->setNumberOfItems($instance['numberOfPins']);
+                $dataProvider->hydrate($instance['metaFields'][$instance['feed']]);
 
-            $view = new View(base64_decode($instance['template']));
+                $view = new View(base64_decode($instance['template']));
 
-            // If the loaded view does not exist then roll back to a sane default
-            if (!$view->exists()) {
-                $view = new View(base64_decode($this->defaultTemplate));
+                // If the loaded view does not exist then roll back to a sane default
+                if (!$view->exists()) {
+                    $view = new View(base64_decode($this->defaultTemplate));
+                }
+
+                $output = $args['before_widget'];
+                $output .= $view->render(array(
+                    'widget' => $this,
+                    'title' => $args['before_title'] . apply_filters('widget_title', $instance['title']) . $args['after_title'],
+                    'items' => $dataProvider->execute(),
+                    'followSrc' => $dataProvider->getFollowSrc(),
+                    'feed_type' => $instance['feed'],
+                    'fields' => $instance['metaFields'][$instance['feed']]
+                ));
+                $output .= $args['after_widget'];
+
+                $cache[$args['widget_id']] = base64_encode($output);
+                set_transient($this->slug, $cache, 1 * HOUR_IN_SECONDS);
             }
-
-            $output = $args['before_widget'];
-            $output .= $view->render(array(
-                'widget' => $this,
-                'title' => $args['before_title'] . apply_filters('widget_title', $instance['title']) . $args['after_title'],
-                'items' => $dataProvider->execute(),
-                'followSrc' => $dataProvider->getFollowSrc(),
-                'feed_type' => $instance['feed'],
-                'fields' => $instance['metaFields'][$instance['feed']]
-            ));
-            $output .= $args['after_widget'];
-
-            $cache[ $args['widget_id'] ] = base64_encode($output);
-            set_transient( $this->slug, $cache, 1 * HOUR_IN_SECONDS );
+            catch( \Exception $e )
+            {
+                // @todo Possibly show a default view, or disable widget entirely as we do not want it breaking websites
+                return false;
+            }
 
         }else{
             $output = base64_decode( $cache[$args['widget_id']] ) . '<!-- From cache -->';
         }
 
         echo $output;
+        return true;
     }
 
     /**
