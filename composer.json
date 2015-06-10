@@ -15,7 +15,7 @@
     "wordpress"
   ],
   "support": {
-    "issues": "https://github.com/carbontwelve/SocialFeeds/issues"
+    "issues": "https://github.com/carbontwelve/wordpress-social-feeds/issues"
   },
   "require": {
     "php": ">=5.4.0",
