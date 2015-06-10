@@ -1,5 +1,5 @@
 {
-  "name": "carbontwelve/social-feeds",
+  "name": "carbontwelve/wordpress-social-feeds",
   "type": "wordpress-plugin",
   "license": "MIT",
   "description": "A widget that provides nicely formatted social media feeds for WordPress",
