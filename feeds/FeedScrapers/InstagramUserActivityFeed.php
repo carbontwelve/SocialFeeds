@@ -9,6 +9,11 @@ use Carbontwelve\Widgets\SocialFeeds\Feeds\AbstractFeed;
 use Carbontwelve\Widgets\SocialFeeds\Feeds\FeedInterface;
 use Carbontwelve\Widgets\SocialFeeds\Feeds\FeedItem;
 
+/**
+ * Class InstagramUserActivityFeed
+ * @package Carbontwelve\Widgets\SocialFeeds\Feeds\FeedScrapers
+ * @author Simon Dann <simon.dann@gmail.com>
+ */
 class InstagramUserActivityFeed extends AbstractFeed implements FeedInterface
 {
     /**
@@ -41,6 +46,13 @@ class InstagramUserActivityFeed extends AbstractFeed implements FeedInterface
         'USERNAME' => 'Your instagram username'
     );
 
+    /**
+     * Returns feed data as an array, if the feed returned by getFeedData is null then
+     * an exception is thrown.
+     *
+     * @return array
+     * @throws \Exception
+     */
     public function execute()
     {
         if ( $feedData = $this->getFeedData() )
@@ -51,6 +63,12 @@ class InstagramUserActivityFeed extends AbstractFeed implements FeedInterface
         throw new \Exception('Problem with executing Instagram User Activity Feed');
     }
 
+    /**
+     * Returns null on feed error, otherwise it will provide an array with n items, where n is the number of items that
+     * the widget it configured to show.
+     *
+     * @return array|null
+     */
     private function getFeedData()
     {
         /** @noinspection PhpIncludeInspection */
