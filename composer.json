@@ -2,7 +2,7 @@
   "name": "carbontwelve/social-feeds",
   "type": "wordpress-plugin",
   "license": "MIT",
-  "description": "Some nice feed formatters for WordPress",
+  "description": "A widget that provides nicely formatted social media feeds for WordPress",
   "homepage": "http://www.photogabble.co.uk",
   "authors": [
     {
