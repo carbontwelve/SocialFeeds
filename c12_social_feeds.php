@@ -1,4 +1,6 @@
-<?php namespace Carbontwelve\Widgets\SocialFeeds;
+<?php
+
+namespace Carbontwelve\Widgets\SocialFeeds;
 
 /*
 Plugin Name:        Social Feeds Widget
@@ -13,35 +15,34 @@ License URI:        http://opensource.org/licenses/MIT
 */
 
 /** @noinspection PhpIncludeInspection */
-require_once(__DIR__ . DIRECTORY_SEPARATOR . 'feeds' . DIRECTORY_SEPARATOR . 'FeedFactory.php');
+require_once __DIR__.DIRECTORY_SEPARATOR.'feeds'.DIRECTORY_SEPARATOR.'FeedFactory.php';
 /** @noinspection PhpIncludeInspection */
-require_once(__DIR__ . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . 'View.php');
+require_once __DIR__.DIRECTORY_SEPARATOR.'libs'.DIRECTORY_SEPARATOR.'View.php';
 
 use Carbontwelve\Widgets\SocialFeeds\Feeds\FeedFactory;
 use Carbontwelve\Widgets\SocialFeeds\Libs\View;
 
 /**
- * Class PinterestFeedWidget
- * @package Carbontwelve\Widgets\SocialFeeds
+ * Class PinterestFeedWidget.
  */
-class PinterestFeedWidget extends \WP_Widget {
-
+class c12_social_feeds extends \WP_Widget
+{
     /**
-     * Plugin version
+     * Plugin version.
      *
      * @var string
      */
     const VERSION = '1.0.0';
 
     /**
-     * Plugin Slug, used for caching
+     * Plugin Slug, used for caching.
      *
      * @var string
      */
     private $slug = 'Carbontwelve_PinterestFeed_Widget';
 
     /**
-     * Path where we are to look for views
+     * Path where we are to look for views.
      *
      * @var string
      */
@@ -58,23 +59,24 @@ class PinterestFeedWidget extends \WP_Widget {
     private $feedFactory;
 
     /**
-     * Register widget with WordPress
+     * Register widget with WordPress.
      */
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(
             $this->slug,
             __('Pinterest Feed', 'carbontwelve'),
-            array(
-                'description' => __('Display your pinterest feed.','carbontwelve')
-            )
+            [
+                'description' => __('Display your pinterest feed.', 'carbontwelve'),
+            ]
         );
 
-        $this->feedFactory     = new FeedFactory();
-        $this->viewsPath       = __DIR__ . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
-        $this->defaultTemplate = base64_encode( $this->viewsPath . 'frontend.php');
+        $this->feedFactory = new FeedFactory();
+        $this->viewsPath = __DIR__.DIRECTORY_SEPARATOR.'views'.DIRECTORY_SEPARATOR;
+        $this->defaultTemplate = base64_encode($this->viewsPath.'frontend.php');
 
         // Enqueue Plugin Styles and scripts for admin pages
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminScripts' ) );
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminScripts']);
     }
 
     /**
@@ -82,20 +84,19 @@ class PinterestFeedWidget extends \WP_Widget {
      *
      * @see WP_Widget::widget()
      *
-     * @param array $args Widget arguments.
+     * @param array $args     Widget arguments.
      * @param array $instance Saved values from database.
+     *
      * @return bool
      */
-    public function widget( $args, $instance )
+    public function widget($args, $instance)
     {
-
-        if ( ! ( $cache = get_transient( $this->slug ) ) ) {
-            $cache = array();
-            set_transient( $this->slug, $cache, 1 * HOUR_IN_SECONDS );
+        if (!($cache = get_transient($this->slug))) {
+            $cache = [];
+            set_transient($this->slug, $cache, 1 * HOUR_IN_SECONDS);
         }
 
-        if ( ! isset($cache[$args['widget_id']]) ) {
-
+        if (!isset($cache[$args['widget_id']])) {
             try {
                 $dataProvider = $this->feedFactory->getFeed($instance['feed']);
                 $dataProvider->setNumberOfItems($instance['numberOfPins']);
@@ -109,30 +110,28 @@ class PinterestFeedWidget extends \WP_Widget {
                 }
 
                 $output = $args['before_widget'];
-                $output .= $view->render(array(
-                    'widget' => $this,
-                    'title' => $args['before_title'] . apply_filters('widget_title', $instance['title']) . $args['after_title'],
-                    'items' => $dataProvider->execute(),
+                $output .= $view->render([
+                    'widget'    => $this,
+                    'title'     => $args['before_title'].apply_filters('widget_title', $instance['title']).$args['after_title'],
+                    'items'     => $dataProvider->execute(),
                     'followSrc' => $dataProvider->getFollowSrc(),
                     'feed_type' => $instance['feed'],
-                    'fields' => $instance['metaFields'][$instance['feed']]
-                ));
+                    'fields'    => $instance['metaFields'][$instance['feed']],
+                ]);
                 $output .= $args['after_widget'];
 
                 $cache[$args['widget_id']] = base64_encode($output);
                 set_transient($this->slug, $cache, 1 * HOUR_IN_SECONDS);
-            }
-            catch( \Exception $e )
-            {
+            } catch (\Exception $e) {
                 // @todo Possibly show a default view, or disable widget entirely as we do not want it breaking websites
                 return false;
             }
-
-        }else{
-            $output = base64_decode( $cache[$args['widget_id']] ) . '<!-- From cache -->';
+        } else {
+            $output = base64_decode($cache[$args['widget_id']]).'<!-- From cache -->';
         }
 
         echo $output;
+
         return true;
     }
 
@@ -142,23 +141,23 @@ class PinterestFeedWidget extends \WP_Widget {
      * @see WP_Widget::form()
      *
      * @param array $instance Previously saved values from database.
+     *
      * @return void
      */
-    public function form ( $instance )
+    public function form($instance)
     {
-
-        $view = new View( $this->viewsPath . 'backend.php');
-        echo $view->render(array(
+        $view = new View($this->viewsPath.'backend.php');
+        echo $view->render([
             'widget'             => $this,
-            'title'              => ( isset( $instance[ 'title' ] ) ) ? $instance[ 'title' ] : __( 'Title', 'carbontwelve' ),
-            'username'           => ( isset( $instance[ 'username' ] ) ) ? $instance[ 'username' ] : '',
-            'numberOfPins'       => (int) ( isset( $instance[ 'numberOfPins' ] ) ) ? $instance[ 'numberOfPins' ] : 6,
-            'template'           => ( isset( $instance[ 'template' ] ) ) ? $instance[ 'template' ] : $this->defaultTemplate,
+            'title'              => (isset($instance[ 'title' ])) ? $instance[ 'title' ] : __('Title', 'carbontwelve'),
+            'username'           => (isset($instance[ 'username' ])) ? $instance[ 'username' ] : '',
+            'numberOfPins'       => (int) (isset($instance[ 'numberOfPins' ])) ? $instance[ 'numberOfPins' ] : 6,
+            'template'           => (isset($instance[ 'template' ])) ? $instance[ 'template' ] : $this->defaultTemplate,
             'availableTemplates' => $this->identifyWidgetViews(),
             'availableFeeds'     => $this->feedFactory->getFeedsForDropDown(),
-            'feed'               => ( isset( $instance[ 'feed' ] ) ) ? $instance[ 'feed' ] : '',
-            'feedFields'         => $this->feedFactory->getFeedFields( $instance, $this )
-        ));
+            'feed'               => (isset($instance[ 'feed' ])) ? $instance[ 'feed' ] : '',
+            'feedFields'         => $this->feedFactory->getFeedFields($instance, $this),
+        ]);
     }
 
     /**
@@ -171,26 +170,24 @@ class PinterestFeedWidget extends \WP_Widget {
      *
      * @return array Updated safe values to be saved.
      */
-    public function update( $new_instance, $old_instance ) {
+    public function update($new_instance, $old_instance)
+    {
         $this->clearCache();
 
-        $output = array(
-            'title'         => ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '',
-            'numberOfPins'  => (int) ( ! empty( $new_instance['numberOfPins'] ) ) ? strip_tags( $new_instance['numberOfPins'] ) : 6,
-            'template'      => ( isset( $new_instance[ 'template' ] ) ) ? $new_instance[ 'template' ] : $this->defaultTemplate,
-            'feed'          => ( isset( $new_instance[ 'feed' ] ) ) ? $new_instance[ 'feed' ] : '',
-            'metaFields'    => array()
-        );
+        $output = [
+            'title'         => (!empty($new_instance['title'])) ? strip_tags($new_instance['title']) : '',
+            'numberOfPins'  => (int) (!empty($new_instance['numberOfPins'])) ? strip_tags($new_instance['numberOfPins']) : 6,
+            'template'      => (isset($new_instance[ 'template' ])) ? $new_instance[ 'template' ] : $this->defaultTemplate,
+            'feed'          => (isset($new_instance[ 'feed' ])) ? $new_instance[ 'feed' ] : '',
+            'metaFields'    => [],
+        ];
 
         // Parse Meta Fields
-        foreach ($new_instance['metaFields'] as $feedName => $fields)
-        {
-            if ( ! isset($output['metaFields'][$feedName]) )
-            {
-                $output['metaFields'][$feedName] = array();
+        foreach ($new_instance['metaFields'] as $feedName => $fields) {
+            if (!isset($output['metaFields'][$feedName])) {
+                $output['metaFields'][$feedName] = [];
             }
-            foreach ($fields as $key => $value)
-            {
+            foreach ($fields as $key => $value) {
                 $output['metaFields'][$feedName][$key] = $value;
             }
         }
@@ -199,40 +196,48 @@ class PinterestFeedWidget extends \WP_Widget {
     }
 
     /**
-     * Clears the cache for this widget
+     * Clears the cache for this widget.
+     *
      * @return bool
      */
-    public function clearCache() {
-        return wp_cache_delete( $this->slug, 'widget' );
+    public function clearCache()
+    {
+        return wp_cache_delete($this->slug, 'widget');
     }
 
-    public function enqueueAdminScripts( $hookName )
+    public function enqueueAdminScripts($hookName)
     {
-        if ( $hookName !== 'widgets.php' ){ return; }
-        wp_enqueue_script( 'c12-social-admin-script', plugins_url( 'assets/js/c12-social-admin.js', __FILE__ ), array( 'jquery' ), self::VERSION, true );
+        if ($hookName !== 'widgets.php') {
+            return;
+        }
+        wp_enqueue_script('c12-social-admin-script', plugins_url('assets/js/c12-social-admin.js', __FILE__), ['jquery'], self::VERSION, true);
     }
 
     private function identifyWidgetViews()
     {
-        $output = array();
+        $output = [];
 
-        $views = array_filter(scandir($this->viewsPath), function($value){
-            if ($value === '.' || $value === '..' || strpos($value, 'backend') !== false ){ return false; }
+        $views = array_filter(scandir($this->viewsPath), function ($value) {
+            if ($value === '.' || $value === '..' || strpos($value, 'backend') !== false) {
+                return false;
+            }
+
             return true;
         });
 
-        foreach ( $views as $view )
-        {
-            $fileContent = file_get_contents($this->viewsPath . $view );
-            if ( $fileContent === false){ continue; }
+        foreach ($views as $view) {
+            $fileContent = file_get_contents($this->viewsPath.$view);
+            if ($fileContent === false) {
+                continue;
+            }
             preg_match('/ViewName: (.*)/', $fileContent, $matches);
-            $output[ base64_encode( $this->viewsPath . $view ) ] = isset($matches[1]) ? $matches[1] : 'Unknown';
+            $output[ base64_encode($this->viewsPath.$view) ] = isset($matches[1]) ? $matches[1] : 'Unknown';
         }
 
         return $output;
     }
 }
 
-add_action( 'widgets_init', function(){
-    register_widget( __NAMESPACE__ . '\\PinterestFeedWidget' );
+add_action('widgets_init', function () {
+    register_widget(__NAMESPACE__.'\\PinterestFeedWidget');
 });
