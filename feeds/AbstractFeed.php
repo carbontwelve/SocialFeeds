@@ -1,66 +1,69 @@
-<?php namespace Carbontwelve\Widgets\SocialFeeds\Feeds;
+<?php
 
-require_once(__DIR__ . DIRECTORY_SEPARATOR . 'FeedInterface.php');
+namespace Carbontwelve\Widgets\SocialFeeds\Feeds;
 
-abstract class AbstractFeed  implements FeedInterface
+require_once __DIR__.DIRECTORY_SEPARATOR.'FeedInterface.php';
+
+abstract class AbstractFeed implements FeedInterface
 {
     /**
-     * The Public facing name of this feed
+     * The Public facing name of this feed.
      *
      * @var string
      */
     protected $name = '';
 
     /**
-     * The feed source url
+     * The feed source url.
      *
      * @var string
      */
     protected $feedSrc = '';
 
     /**
-     * The follow user source url
+     * The follow user source url.
+     *
      * @var string
      */
     protected $followSrc = '';
 
     /**
      * Unique fields for the source url, this is so that we may have different inputs for the widget
-     * depending upon which source feed the user has defined
+     * depending upon which source feed the user has defined.
      *
      * @var array
      */
-    protected $uniqueFields = array();
+    protected $uniqueFields = [];
 
     /**
-     * Feed data, must match the fields in $this->uniqueFields
+     * Feed data, must match the fields in $this->uniqueFields.
      *
      * @var array
      */
-    protected $feedData = array();
+    protected $feedData = [];
 
     /**
-     * How long we should wait for the feed provider before giving up
+     * How long we should wait for the feed provider before giving up.
      *
      * @var int
      */
     protected $TTL = 60;
 
     /**
-     * Total number of feed items to grab on execute
+     * Total number of feed items to grab on execute.
      *
      * @var int
      */
     protected $numberOfItems = 9;
 
     /**
-     * Format to be used for formatting dates
+     * Format to be used for formatting dates.
      *
      * @var string
      */
     protected $dateFormat = 'M d, Y';
 
-    public function __construct(array $uniqueFieldsData = array(), $numberOfItems = 9, $dateFormat = 'M d, Y', $TTL = 60)
+    public function __construct(array $uniqueFieldsData = [], $numberOfItems = 9, $dateFormat = 'M d, Y', $TTL = 60)
     {
         $this->setFieldData($uniqueFieldsData);
         $this->setNumberOfItems($numberOfItems);
@@ -69,37 +72,37 @@ abstract class AbstractFeed  implements FeedInterface
     }
 
     /**
-     * Set the TTL value
+     * Set the TTL value.
      *
      * @param int $TTL
      */
-    public function setTTL( $TTL )
+    public function setTTL($TTL)
     {
         $this->TTL = (int) $TTL;
     }
 
     /**
-     * Set the number of items to grab on execute
+     * Set the number of items to grab on execute.
      *
      * @param int $numberOfItems
      */
-    public function setNumberOfItems ( $numberOfItems )
+    public function setNumberOfItems($numberOfItems)
     {
         $this->numberOfItems = $numberOfItems;
     }
 
     /**
-     * Set the format to be used for formatting dates
+     * Set the format to be used for formatting dates.
      *
      * @param string $dateFormat
      */
-    public function setDateFormat( $dateFormat )
+    public function setDateFormat($dateFormat)
     {
         $this->dateFormat = $dateFormat;
     }
 
     /**
-     * Return the feed source url
+     * Return the feed source url.
      *
      * @return string
      */
@@ -109,7 +112,7 @@ abstract class AbstractFeed  implements FeedInterface
     }
 
     /**
-     * Set the feed source url
+     * Set the feed source url.
      *
      * @param string $feedSrc
      */
@@ -119,7 +122,7 @@ abstract class AbstractFeed  implements FeedInterface
     }
 
     /**
-     * Returns the public facing name for this feed
+     * Returns the public facing name for this feed.
      *
      * @return string
      */
@@ -129,7 +132,7 @@ abstract class AbstractFeed  implements FeedInterface
     }
 
     /**
-     * Get the unique fields for this feed type
+     * Get the unique fields for this feed type.
      *
      * @return array
      */
@@ -139,7 +142,7 @@ abstract class AbstractFeed  implements FeedInterface
     }
 
     /**
-     * Get the follow link for this feed type
+     * Get the follow link for this feed type.
      *
      * @return string
      */
@@ -154,12 +157,10 @@ abstract class AbstractFeed  implements FeedInterface
      *
      * @param array $uniqueFieldsData
      */
-    protected function setFieldData( array $uniqueFieldsData )
+    protected function setFieldData(array $uniqueFieldsData)
     {
-        foreach( $this->uniqueFields as $key => $value )
-        {
-            if ( ! isset($uniqueFieldsData[$key]) )
-            {
+        foreach ($this->uniqueFields as $key => $value) {
+            if (!isset($uniqueFieldsData[$key])) {
                 continue;
             }
 
@@ -167,7 +168,7 @@ abstract class AbstractFeed  implements FeedInterface
         }
     }
 
-    public function hydrate( array $fields )
+    public function hydrate(array $fields)
     {
         $this->setFieldData($fields);
     }
